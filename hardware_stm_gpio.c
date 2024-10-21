@@ -87,9 +87,9 @@ void initGpioC6AsInput( void )
     
     /*Configure pulled-down*/
     uint32_t PINC6_PUPDR_PD = (uint32_t) 0x2000;
-    reg_pointer = (uint32_t *)PORTB_PUPDR_REGISTER;
+    reg_pointer = (uint32_t *)PORTC_PUPDR_REGISTER;
     *reg_pointer = *reg_pointer & PINC6_RESET; // reset pinc pupdr
-    *reg_pointer = *reg_pointer & PINC6_PUPDR_PD; // set pinc pupdr to PD
+    *reg_pointer = *reg_pointer | PINC6_PUPDR_PD; // set pinc pupdr to PD
 
 }
 

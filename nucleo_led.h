@@ -18,6 +18,8 @@
 
 void init_LED1(void);
 void toggle_LED1( void);
+void check_and_set_LED(void);
+void initC6(void);
 
 #ifdef __cplusplus
 }

@@ -26,3 +26,25 @@ void toggle_LED1( void )
     toggleGPIOB0();
 }
 
+void check_and_set_LED()
+{
+    static uint32_t previous_state;
+    uint32_t value = checkGPIOC6();
+    if (value > 0){
+        if (previous_state != 1){
+            setGPIOB0();
+            previous_state = 1;
+        }
+    }
+    else {
+        if (previous_state == 1){
+            clearGPIOB0();
+            previous_state = 0;
+        }
+        
+    }
+}
+
+void initC6(void){
+    initGpioC6AsInput();
+}

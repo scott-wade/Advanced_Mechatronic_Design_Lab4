@@ -5,13 +5,13 @@
 int main (void)
 {
     /* Initializations */
-    //init_LED1(); //uncomment once you have filled in the function
+    init_LED1(); //uncomment once you have filled in the function
     while(1)
     {
       
       toggle_LED1(); //uncomment once you have filled in the function
       debugprintHelloWorld();
-      for(int i=0; i<100000; i++){
+      for(int i=0; i<100; i++){
           debugprint(i);
       }
     

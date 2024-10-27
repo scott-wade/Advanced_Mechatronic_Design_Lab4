@@ -20,6 +20,7 @@ void init_LED1(void);
 void toggle_LED1( void);
 void check_and_set_LED(void);
 void initC6(void);
+void init_tim3_output3_toggle_LED(void);
 
 #ifdef __cplusplus
 }

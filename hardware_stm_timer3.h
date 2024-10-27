@@ -1,6 +1,6 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __HARDWARE_STM_GPIO_H_
-#define __HARDWARE_STM_GPIO_H_
+#ifndef __HARDWARE_STM_TIM3_H_
+#define __HARDWARE_STM_TIM3_H_
 
 #ifdef __cplusplus
  extern "C" {
@@ -8,7 +8,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
 
 /* Macros for Everyone--------------------------------------------------------*/
 #define PIN_0   0
@@ -23,20 +22,11 @@
 #define PIN_9   9
 #define PIN_10  10
 
-
-
-
 /*Function definitions---------------------------------------------------------*/
-void initGpioB0AsOutput( void );
-void toggleGPIOB0( void );
-void setGPIOB0( void );
-void clearGPIOB0( void );
-void initGpioC6AsInput( void );
-uint32_t checkGPIOC6(void);
-void initGpioB0AsAF2( void );
+void init_tim3_output3_toggle(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /*__GPIO_H */
+#endif /*__HARDWARE_STM_TIM3_H_ */

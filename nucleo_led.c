@@ -9,6 +9,7 @@
   */
 
 #include "hardware_stm_gpio.h"
+#include "hardware_stm_timer3.h"
 #include "nucleo_led.h"
 
 /************************************
@@ -47,4 +48,11 @@ void check_and_set_LED()
 
 void initC6(void){
     initGpioC6AsInput();
+}
+
+void init_tim3_output3_toggle_LED(void){
+    //Enable GPIO B0 for its Alternate Function 2
+    initGpioB0AsAF2();
+    // configure timer3 channel3 as a toggle output comparison
+    init_tim3_output3_toggle();
 }

@@ -55,6 +55,7 @@
 #define PORTC_AFR2_REGISTER (PORTC_BASE_ADDRESS + 0x24)
 #define PORTC_OSPEEDR_REGISTER (PORTC_BASE_ADDRESS + 0x08)
 
+
 //flags MODER Register:
 
 //flags OTYPER Register:
@@ -104,6 +105,38 @@ void initGpioB0AsOutput( void )
     reg_pointer = (uint32_t *)PORTB_MODER_REGISTER;
     *reg_pointer = *reg_pointer & PINB0_MODER_RESET; // reset pinB moder pin
     *reg_pointer = *reg_pointer | (uint32_t) 0x01; // set pinB moder to output
+    /*GPIOB0 configured as push-pull */
+    reg_pointer = (uint32_t *)PORTB_OTYPER_REGISTER;
+    uint32_t PINB0_OTYPER_PUSHPULL = ~((uint32_t) 0x1);
+    *reg_pointer = *reg_pointer & PINB0_OTYPER_PUSHPULL;
+    /*GPIOB0 configured floating */
+    reg_pointer = (uint32_t *)PORTB_PUPDR_REGISTER;
+    uint32_t PINB0_PUPDR_FLOATING = ~((uint32_t) 0b11);
+    *reg_pointer = *reg_pointer & PINB0_PUPDR_FLOATING;
+    /* GPIOB0 driven high to start out with */
+    reg_pointer = (uint32_t *)PORTB_ODR_REGISTER;
+    *reg_pointer = *reg_pointer | 0b01;
+    
+}
+
+void initGpioB0AsAF2( void )
+{
+    uint32_t  * reg_pointer;
+    /* GPIOB Peripheral clock enable */
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+    /* GPIOB0 configured as AF */
+    uint32_t PINB0_MODER_RESET = (uint32_t)0x280 & (uint32_t)0b11;
+    reg_pointer = (uint32_t *)PORTB_MODER_REGISTER;
+    *reg_pointer = *reg_pointer & PINB0_MODER_RESET; // reset pinB moder pin
+    *reg_pointer = *reg_pointer | (uint32_t) 0x10; // set pinB moder to AF
+    /*Select AF2*/
+    uint32_t PINB0_AF2_SET = (uint32_t)0b0010;
+    reg_pointer = (uint32_t *)PORTB_AFR1_REGISTER;
+    *reg_pointer = *reg_pointer & ~((uint32_t)0b1111);
+    *reg_pointer = *reg_pointer | PINB0_AF2_SET;
+    /*Set high speed pin*/
+    reg_pointer = (uint32_t *)PORTB_OSPEEDR_REGISTER;
+    *reg_pointer = *reg_pointer | ((uint32_t)0b0011);
     /*GPIOB0 configured as push-pull */
     reg_pointer = (uint32_t *)PORTB_OTYPER_REGISTER;
     uint32_t PINB0_OTYPER_PUSHPULL = ~((uint32_t) 0x1);

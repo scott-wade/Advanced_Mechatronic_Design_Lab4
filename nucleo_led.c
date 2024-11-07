@@ -54,5 +54,5 @@ void init_tim3_output3_toggle_LED(void){
     //Enable GPIO B0 for its Alternate Function 2
     initGpioB0AsAF2();
     // configure timer3 channel3 as a toggle output comparison
-    init_tim3_output3_toggle();
+    init_tim3_output3_toggle((uint16_t)10000, (uint8_t)1);
 }

@@ -30,7 +30,8 @@
 
 
 
-void init_tim3_output3_toggle(void){
+void init_tim3_output3_toggle(uint16_t interval, uint8_t OC_interrupt){
+    //interval should be in units of 100us
     uint32_t* reg_ptr;
     // enable APB1 clock
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
@@ -44,7 +45,7 @@ void init_tim3_output3_toggle(void){
 
     // Set wanted period value to TIM3_AAR (should it be CCR3?)
     reg_ptr = TIM3_ARR_REGISTER;
-    *reg_ptr = (uint16_t)10000; // every 10,000 cycles, aka 1Hz, trigger
+    *reg_ptr = (uint16_t)interval; // every 10,000 cycles, aka 1Hz, trigger
     // Set mode to toggle in CCMR2
     /*
     The output pin can keep its level (OCxM=000), be set
@@ -65,8 +66,50 @@ void init_tim3_output3_toggle(void){
     *reg_ptr = *reg_ptr & ~((uint16_t)0x100);// is this line necessary?
     *reg_ptr = *reg_ptr | (uint16_t)0x100;
 
+    // Set interrupt enable CCxIE and/or CCxDE
+    reg_ptr = TIM3_DIER_REGISTER;
+    if (OC_interrupt > 0){
+        *reg_ptr = *reg_ptr | (uint16_t)0b1000;
+    }else{
+         *reg_ptr = *reg_ptr & (uint16_t)0b0111;
+    }
+    
     // Enable timer by setting CEN bit in TIM3_CR1
     reg_ptr = TIM3_CR1_REGISTER;
     *reg_ptr = *reg_ptr | (uint16_t)0b1;
+
+}
+
+void init_tim3_incap(void){
+    uint32_t* reg_ptr;
+    //Write CC1S bits in TIMx_CCMR1 register to select the input (01 for TI1) 
+    reg_ptr = (uint32_t*)TIM3_CCMR1_REGISTER;
+    *reg_ptr = *reg_ptr & ~((uint32_t)0b11); //clear bits
+    *reg_ptr = *reg_ptr | (uint32_t)0b01; //set bits
+
+    //Write ICxF bits (7:4) in TIMx_CCMR1 register to select the lowpass filter duration, say 8 samples (0011)
+    *reg_ptr = *reg_ptr & ~((uint32_t)0xf0); //clear bits
+    *reg_ptr = *reg_ptr | (uint32_t)0x30; //0011
+    //Write IC1PS bits (3:2) to 00 in the TIMx_CCMR1 register (disable prescale)
+    // 0b00xx
+    *reg_ptr = *reg_ptr & ~((uint32_t)0b1100); //clear bits
+
+    //Write CC1P and CC1NP bits to 00 in the TIMx_CCER register to select rising edge
+    // CC1P is bit 1, CC1NP is bit 3, the order of bits is CC1NP/CC1P 
+    reg_ptr = (uint32_t*)TIM3_CCER_REGISTER;
+    *reg_ptr = *reg_ptr & ~((uint32_t)0b1010); //clear bits
+
+    //Set CC1E bit in TIMx_CCER register (enable capture)
+    // bit 0
+    *reg_ptr = *reg_ptr | (uint32_t)0b1; //set bit
+
+    //Optionally, to enable interrupt or DMA, set CC1IE or CC1DE in TIMx_DIER 
+
+    // Enable timer by setting CEN bit in TIM3_CR1
+    reg_ptr = TIM3_CR1_REGISTER;
+    *reg_ptr = *reg_ptr | (uint16_t)0b1;
+}
+
+void init_tim3_pwm(void){
 
 }

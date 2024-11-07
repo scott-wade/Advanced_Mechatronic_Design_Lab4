@@ -94,6 +94,34 @@ void initGpioC6AsInput( void )
 
 }
 
+void initGpioC6AsAF2 (void)
+{
+    uint32_t* reg_pointer; 
+    /* GPIOC Peripheral clock enable */
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+    /* GPIOC Pin 6 as input*/
+    uint32_t PINC6_RESET = ~((uint32_t) 0x3000);
+    reg_pointer = (uint32_t *)PORTC_MODER_REGISTER;
+    *reg_pointer = *reg_pointer & PINC6_RESET; // reset pinC moder pin
+    *reg_pointer = *reg_pointer & (uint32_t) 0x2000; // set pinC moder to AF
+
+    //No need to configure push-pull or speed for input pins
+    
+    /*Configure pulled-down*/
+    uint32_t PINC6_PUPDR_PD = (uint32_t) 0x2000;
+    reg_pointer = (uint32_t *)PORTC_PUPDR_REGISTER;
+    *reg_pointer = *reg_pointer & PINC6_RESET; // reset pinc pupdr
+    *reg_pointer = *reg_pointer | PINC6_PUPDR_PD; // set pinc pupdr to PD
+
+    // Configure alternate function 2
+    /*Select AF2*/
+    uint32_t PINC6_AF2_SET = (uint32_t)0x2000000;
+    reg_pointer = (uint32_t *)PORTC_AFR1_REGISTER;
+    *reg_pointer = *reg_pointer & ~((uint32_t)0xF000000);
+    *reg_pointer = *reg_pointer | PINC6_AF2_SET;
+
+}
+
 
 void initGpioB0AsOutput( void )
 {

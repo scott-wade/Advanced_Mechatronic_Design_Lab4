@@ -23,7 +23,9 @@
 #define PIN_10  10
 
 /*Function definitions---------------------------------------------------------*/
-void init_tim3_output3_toggle(void);
+void init_tim3_output3_toggle(uint16_t interval, uint8_t OC_interrupt);
+void init_tim3_incap(void);
+void init_tim3_pwm(void);
 
 #ifdef __cplusplus
 }

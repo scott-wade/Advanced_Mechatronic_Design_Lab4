@@ -129,10 +129,10 @@ void initGpioB0AsOutput( void )
     /* GPIOB Peripheral clock enable */
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
     /* GPIOB0 configured as output */
-    uint32_t PINB0_MODER_RESET = (uint32_t)0x280 & (uint32_t)0b11;
+    uint32_t PINB0_MODER_RESET = ~(uint32_t)0b11;
     reg_pointer = (uint32_t *)PORTB_MODER_REGISTER;
     *reg_pointer = *reg_pointer & PINB0_MODER_RESET; // reset pinB moder pin
-    *reg_pointer = *reg_pointer | (uint32_t) 0x01; // set pinB moder to output
+    *reg_pointer = *reg_pointer | (uint32_t) 0b01; // set pinB moder to output
     /*GPIOB0 configured as push-pull */
     reg_pointer = (uint32_t *)PORTB_OTYPER_REGISTER;
     uint32_t PINB0_OTYPER_PUSHPULL = ~((uint32_t) 0x1);
@@ -153,10 +153,10 @@ void initGpioB0AsAF2( void )
     /* GPIOB Peripheral clock enable */
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
     /* GPIOB0 configured as AF */
-    uint32_t PINB0_MODER_RESET = (uint32_t)0x280 & (uint32_t)0b11;
+    uint32_t PINB0_MODER_RESET = ~(uint32_t)0b11;
     reg_pointer = (uint32_t *)PORTB_MODER_REGISTER;
-    *reg_pointer = *reg_pointer & PINB0_MODER_RESET; // reset pinB moder pin
-    *reg_pointer = *reg_pointer | (uint32_t) 0x10; // set pinB moder to AF
+    *reg_pointer = *reg_pointer & PINB0_MODER_RESET; // reset pinB0 moder pin
+    *reg_pointer = *reg_pointer | (uint32_t) 0b10; // set pinB0 moder to AF
     /*Select AF2*/
     uint32_t PINB0_AF2_SET = (uint32_t)0b0010;
     reg_pointer = (uint32_t *)PORTB_AFR1_REGISTER;

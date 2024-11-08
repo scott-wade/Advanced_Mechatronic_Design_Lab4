@@ -135,6 +135,48 @@ void init_tim3_incap(uint16_t interval){
     *reg_ptr = *reg_ptr | (uint16_t)0b1;
 }
 
-void init_tim3_pwm(void){
+void init_tim3_pwm(uint16_t interval, uint16_t ontime){
+    /*
+        Enable TIM3 CH3 for PWM with clock speed of 10kHz
+    */
 
+    uint32_t* reg_ptr;
+    // enable APB1 clock
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+    // clear update event flags in TIM3_SR (clearing all)
+    reg_ptr = (uint32_t*)TIM3_SR_REGISTER;
+    *reg_ptr = (uint32_t)0x0;
+
+    // Upload prescale value to TIM3_PSC
+    reg_ptr = TIM3_PSC_REGISTER;
+    *reg_ptr = (uint16_t)8999; // 10kHz timer
+
+    // Set wanted period value to TIM3_AAR
+    reg_ptr = TIM3_ARR_REGISTER;
+    *reg_ptr = (uint16_t)interval; // every 10,000 cycles, aka 1Hz, trigger
+
+    // Set to PWM mode
+
+    //Write OC3M bits (6:4) in TIMx_CCMR2 register for PWM mode 110
+    //And clear CC3S bits to make ch3 an output
+    //And enable preload (3) 
+    uint16_t OC3M_PWM = 0b1100000;
+    uint16_t CC3S_OUTPUT = 0b00;
+    uint16_t OC3PE_ENABLE = 0b1000;
+    reg_ptr = (uint32_t*)TIM3_CCMR2_REGISTER;
+    *reg_ptr = *reg_ptr & ~((uint16_t)0b1111111); //clear bits for OC3M and CC3S
+    *reg_ptr = *reg_ptr | OC3M_PWM | CC3S_OUTPUT | OC3PE_ENABLE; //set bits
+
+    //Set ontime in CCR3
+    reg_ptr = (uint32_t*)TIM3_CCR3_REGISTER;
+    *reg_ptr = (uint16_t)ontime;
+
+    // Enable channel as output (CCER register,  CC3E set)
+    reg_ptr = TIM3_CCER_REGISTER;
+    *reg_ptr = *reg_ptr & ~((uint16_t)0x100);// is this line necessary?
+    *reg_ptr = *reg_ptr | (uint16_t)0x100;
+
+    // Enable timer by setting CEN bit in TIM3_CR1
+    reg_ptr = TIM3_CR1_REGISTER;
+    *reg_ptr = *reg_ptr | (uint16_t)0b1;
 }

@@ -1,9 +1,7 @@
 # Notes for Lab 4
 
 ## Next steps
- - configure GPIO C6 as its AF2 (bind to TIM3_CH1)
- - in main, do a while loop checking the value of SR (?)
-   - if triggered, print it in the console 
+ - 
 
 
 ### Timer as an input capture
@@ -17,15 +15,13 @@ x Timer setup:
     Write IC1PS bits to 00 in the TIMx_CCMR1 register (disable prescale)
     Set CC1E bit in TIMx_CCER register (enable capture)
     Optionally, to enable interrupt or DMA, set CC1IE or CC1DE in TIMx_DIER 
-
 x Configuring a GPIO pin to link it to a timer pin:
     Configure the pin as an Alternate Function pin, choose pin according to the AF table
         AF2 for pin PC6 binds it to TIM3_CH1
     Configure the pin as an input pin similarly to a normal input pin
-
-Reading the captured value:
-    Using software, check for a value in CCxIF
-    If the CCxIF pin is 1, read the value in TIMx_CCRx
+x Reading the captured value:
+    x Using software, check for a value in CCxIF
+    x If the CCxIF pin is 1, read the value in TIMx_CCRx
         Should automatically clear the interrupt flag (?) check this when implementing
 
 ### Part 5. LED using PWM mode
@@ -34,6 +30,18 @@ Reading the captured value:
 ● Toggle the LED with a frequency of ~0.25Hz
 
 Setting up Tim3 Ch3 in PWM mode:
+x1. Enable the APB1 clock:
+x• RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+x2. Clear the update event flag in the status register TIM3_SR
+x3. Upload the pre-scale value to TIM3_PSC
+x4. Set the wanted period value to the autoreload register TIM3_ARR
+x5. Select PWM Mode 1 for Timer 3 channel 3 by writing 110 to the OC3M bit fields in the CCMR2 register
+x 6. Set channel 3 of Timer 3 to an output by clearing the CC3S bits in the CCMR2 register
+x 7. Set the value to compare to in CCR3, which will set the duty cycle. For example if CCR3 = autoreload/2, then the duty cycle will be
+50%.
+x 8. Enable the Preload register for Timer 3 channel 3 by setting the OC3PE bit in the CCMR2 register
+x 9. Enable the TIM3 channel 3 by setting the CC3E bit in the CCER register
+10. Enable the timer subsystem by setting the CEN bit in TIM3_CR1
 
 
 ### Part 6. Timer as output compare interrupt

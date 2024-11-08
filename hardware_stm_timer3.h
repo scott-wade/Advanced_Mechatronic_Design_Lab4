@@ -43,7 +43,7 @@
 /*Function definitions---------------------------------------------------------*/
 void init_tim3_output3_toggle(uint16_t interval, uint8_t OC_interrupt);
 void init_tim3_incap(uint16_t interval);
-void init_tim3_pwm(void);
+void init_tim3_pwm(uint16_t interval, uint16_t ontime);
 
 #ifdef __cplusplus
 }

@@ -38,7 +38,7 @@
 #define PORTB_OSPEEDR_REGISTER (PORTB_BASE_ADDRESS + 0x08)
 
 //Port C addresses:
-#define PORTC_BASE_ADDRESS ((uint32_t)0x40020800)        //The first address in memory corresponding to Port B (this is in the user manual!)
+#define PORTC_BASE_ADDRESS ((uint32_t)0x40020800)  //The first address in memory corresponding to Port B (this is in the user manual!)
 // I gave you the first one, now you fill in the rest, check in the user manual what is the offset from the base address for each register!
 // GPIO B has addresses 0x4002 0400 - 0x4002 07FF
 #define PORTC_MODER_REGISTER (PORTC_BASE_ADDRESS + 0x00) //replace the question mark with the correct offset!

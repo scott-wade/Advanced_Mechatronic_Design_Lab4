@@ -1,8 +1,9 @@
 # Notes for Lab 4
 
 ## Next steps
- - in. comp.
-
+ - configure GPIO C6 as its AF2 (bind to TIM3_CH1)
+ - in main, do a while loop checking the value of SR (?)
+   - if triggered, print it in the console 
 
 
 ### Timer as an input capture

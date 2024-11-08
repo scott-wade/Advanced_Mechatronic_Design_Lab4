@@ -26,6 +26,7 @@
 #define TIM3_CNT_REGISTER (uint32_t*)(TIM3_BASE_ADDRESS + 0x24)
 #define TIM3_PSC_REGISTER (uint32_t*)(TIM3_BASE_ADDRESS + 0x28)
 #define TIM3_ARR_REGISTER (uint32_t*)(TIM3_BASE_ADDRESS + 0x2c)
+#define TIM3_CCR1_REGISTER (uint32_t*)(TIM3_BASE_ADDRESS + 0x34)
 #define TIM3_CCR3_REGISTER (uint32_t*)(TIM3_BASE_ADDRESS + 0x3c)
 
 
@@ -37,13 +38,13 @@ void init_tim3_output3_toggle(uint16_t interval, uint8_t OC_interrupt){
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
     // clear update event flags in TIM3_SR (UIF?)
     reg_ptr = (uint32_t*)TIM3_SR_REGISTER;
-    *reg_ptr = *reg_ptr & ~((uint32_t)(0b1));
+    *reg_ptr = ~((uint32_t)(0b11));
 
     // Upload prescale value to TIM3_PSC
     reg_ptr = TIM3_PSC_REGISTER;
     *reg_ptr = (uint16_t)8999; // 10kHz timer
 
-    // Set wanted period value to TIM3_AAR (should it be CCR3?)
+    // Set wanted period value to TIM3_AAR
     reg_ptr = TIM3_ARR_REGISTER;
     *reg_ptr = (uint16_t)interval; // every 10,000 cycles, aka 1Hz, trigger
     
@@ -85,8 +86,23 @@ void init_tim3_output3_toggle(uint16_t interval, uint8_t OC_interrupt){
 
 }
 
-void init_tim3_incap(void){
+void init_tim3_incap(uint16_t interval){
     uint32_t* reg_ptr;
+    // enable APB1 clock
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+    // clear update event flags in TIM3_SR (UIF, CC1IF, CC1OF)
+    reg_ptr = (uint32_t*)TIM3_SR_REGISTER;
+    *reg_ptr = ~((uint32_t)(0b11));
+
+    // Upload prescale value to TIM3_PSC
+    reg_ptr = TIM3_PSC_REGISTER;
+    *reg_ptr = (uint16_t)8999; // 10kHz timer
+
+    // Set wanted period value to TIM3_AAR
+    reg_ptr = TIM3_ARR_REGISTER;
+    *reg_ptr = (uint16_t)interval; // every 10,000 cycles, aka 1Hz, trigger
+
+
     //Write CC1S bits in TIMx_CCMR1 register to select the input (01 for TI1) 
     reg_ptr = (uint32_t*)TIM3_CCMR1_REGISTER;
     *reg_ptr = *reg_ptr & ~((uint32_t)0b11); //clear bits
@@ -95,6 +111,7 @@ void init_tim3_incap(void){
     //Write ICxF bits (7:4) in TIMx_CCMR1 register to select the lowpass filter duration, say 8 samples (0011)
     *reg_ptr = *reg_ptr & ~((uint32_t)0xf0); //clear bits
     *reg_ptr = *reg_ptr | (uint32_t)0x30; //0011
+
     //Write IC1PS bits (3:2) to 00 in the TIMx_CCMR1 register (disable prescale)
     // 0b00xx
     *reg_ptr = *reg_ptr & ~((uint32_t)0b1100); //clear bits
@@ -109,6 +126,9 @@ void init_tim3_incap(void){
     *reg_ptr = *reg_ptr | (uint32_t)0b1; //set bit
 
     //Optionally, to enable interrupt or DMA, set CC1IE or CC1DE in TIMx_DIER 
+    // Enable capture interrupt
+    reg_ptr = (uint32_t*)TIM3_DIER_REGISTER;
+    *reg_ptr = *reg_ptr | (uint16_t)0b10;
 
     // Enable timer by setting CEN bit in TIM3_CR1
     reg_ptr = TIM3_CR1_REGISTER;

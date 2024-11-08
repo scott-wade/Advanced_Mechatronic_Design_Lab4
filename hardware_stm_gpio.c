@@ -103,7 +103,7 @@ void initGpioC6AsAF2 (void)
     uint32_t PINC6_RESET = ~((uint32_t) 0x3000);
     reg_pointer = (uint32_t *)PORTC_MODER_REGISTER;
     *reg_pointer = *reg_pointer & PINC6_RESET; // reset pinC moder pin
-    *reg_pointer = *reg_pointer & (uint32_t) 0x2000; // set pinC moder to AF
+    *reg_pointer = *reg_pointer | (uint32_t) 0x2000; // set pinC moder to AF
 
     //No need to configure push-pull or speed for input pins
     

@@ -1,5 +1,10 @@
 # Notes for Lab 4
 
+## Next steps
+ - in. comp.
+
+
+
 ### Timer as an input capture
 
 CCxIF can be cleared by software by writing it to 0 or by reading the captured data stored in the TIMx_CCRx register. 

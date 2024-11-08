@@ -46,21 +46,26 @@ void init_tim3_output3_toggle(uint16_t interval, uint8_t OC_interrupt){
     // Set wanted period value to TIM3_AAR (should it be CCR3?)
     reg_ptr = TIM3_ARR_REGISTER;
     *reg_ptr = (uint16_t)interval; // every 10,000 cycles, aka 1Hz, trigger
+    
     // Set mode to toggle in CCMR2
     /*
     The output pin can keep its level (OCxM=000), be set
     active (OCxM=001), be set inactive (OCxM=010) or can toggle (OCxM=011) on match.
     */
     reg_ptr = TIM3_CCMR2_REGISTER;
-    *reg_ptr = *reg_ptr & ~((uint16_t)0b111000); // clear prior bits
-    *reg_ptr = *reg_ptr | (uint16_t)0b011000; // set toggle to OC3M
+    *reg_ptr = *reg_ptr & ~((uint16_t)0b1110011); // clear prior bits
+    *reg_ptr = *reg_ptr | (uint16_t)0b0110000; // set toggle to OC3M
 
     // Disable preload register (idk what this does rn)
 
 
     // Output compare 1 fast enable ?
-    
 
+    // Set comparison value in CCR3
+    reg_ptr = TIM3_CCR3_REGISTER;
+    *reg_ptr = *reg_ptr & (uint16_t)0x0;
+    *reg_ptr = *reg_ptr | (uint16_t)(interval/2);
+    
     // Configure channel as output (CCER register,  CC3E set)
     reg_ptr = TIM3_CCER_REGISTER;
     *reg_ptr = *reg_ptr & ~((uint16_t)0x100);// is this line necessary?

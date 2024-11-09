@@ -1,6 +1,6 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __HARDWARE_STM_GPIO_H_
-#define __HARDWARE_STM_GPIO_H_
+#ifndef __HARDWARE_STM_INTERRUPT_H_
+#define __HARDWARE_STM_INTERRUPT_H_
 
 #ifdef __cplusplus
  extern "C" {
@@ -25,10 +25,11 @@
 
 /*Function definitions---------------------------------------------------------*/
 void enableNVIC_Timer3(void);
+void enableEXTI6OnPortC(void);
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /*__GPIO_H */
+#endif /*__INTERRUPT_H */

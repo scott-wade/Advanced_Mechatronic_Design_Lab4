@@ -8,8 +8,7 @@
 int main (void)
 {
     /* Initializations */
-    initGpioB0AsOutput();
-    init_tim3_interrupt(40000, 20000);
+    enableEXTI6OnPortC();
     debugprintHelloWorld();
 
 }

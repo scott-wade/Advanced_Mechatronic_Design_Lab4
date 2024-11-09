@@ -64,124 +64,11 @@ x Reading the captured value:
      on output compare as well as Overflow.
     ● Toggle the LED with a frequency of ~0.25Hz using the timer’s interrupt service
     routines from output compare and overflow
-
-Enable the correct interrupt for tim3 Ch3 in the NVIC
-    * MACRO definitions----------------------------------------------------------*/
-    #define SYSTEM_CONTROL_BASE_ADDRESS (0xE000E000)
-    #define NVIC_BASE_ADDRESS (SYSTEM_CONTROL_BASE_ADDRESS + 0x100)
-    #define NVIC_INTERRUPT_SET_ENABLE_REGISTER_0_31 (NVIC_BASE_ADDRESS)
-    #define NVIC_INTERRUPT_SET_ENABLE_REGISTER_32_63 (NVIC_BASE_ADDRESS+0x4)
-    #define NVIC_INTERRUPT_SET_ENABLE_REGISTER_64_95 (NVIC_BASE_ADDRESS+0x8)
-    #define TIM3_INTERRUPT_BIT (0x20000000)
-    void enableNVIC_Timer3(void)
-    {
-    uint32_t * reg_pointer_32;
-    reg_pointer_32 = (uint32_t *)NVIC_INTERRUPT_SET_ENABLE_REGISTER_0_31;
-    *reg_pointer_32 = TIM3_INTERRUPT_BIT;
-    }
-Configure Tim3 CH3 as an output compare with the interrupts enabled 
-    * MACRO definitions----------------------------------------------------------*/
-    #define TIM3_BASE_ADDRESS ((uint32_t)0x40000400)
-    // Timer 3 control register 1
-    #define TIM3_CR1_REGISTER_1 (TIM3_BASE_ADDRESS + 0x00)
-    //flags for CR1 register:
-    #define COUNTER_ENABLE_BIT (uint16_t)0x01
-    // Timer 3 status register
-    #define TIM3_STATUS_REGISTER (TIM3_BASE_ADDRESS + 0x10)
-    //flags for Status register:
-    #define TIM_UIF 0x01 //timer 3 overflow flag
-    #define TIM_CH1_CC1IF 0x02 //timer channel 1 capture/compare event
-    #define TIM_CH3_CC3IF 0x8 //timer channel 3 capture/compare event
-    //timer 3 interrupt enable register
-    # define TIM3_INTERRUPT_ENABLE_REGISTER (TIM3_BASE_ADDRESS + 0x0C)
-    //flags for interrupt enable register:
-    #define TIM_CH3_CC_INTERRUPT_ENABLE 0x8 //timer channel 3 capture/compare interrupt
-    #define TIM_UPDATE_INTERRUPT_ENABLE 0x1 //timer overflow or event interrupt
-    //Capture compare enable register
-    #define TIM3_CAPTURE_COMPARE_ENABLE_REGISTER (TIM3_BASE_ADDRESS + 0x20)
-    //flags for TIM3_CCER registers for output:
-    #define TIM3_CCER_CC3E (0x0100)
-    //Capture compare mode registers
-    #define TIM3_CAPTURE_COMPARE_MODE_1_REGISTER (TIM3_BASE_ADDRESS + 0x18)
-    #define TIM3_CAPTURE_COMPARE_MODE_2_REGISTER (TIM3_BASE_ADDRESS + 0x1C)
-    //flags for Capture compare mode register
-    #define TIM_CCMR13_OCPE (0b00001000) // enable preload register channels 1 and 3
-    // Compare, autoreload and Prescaler registers
-    #define TIM3_COMPARE_1_REGISTER (TIM3_BASE_ADDRESS + 0x34)
-    #define TIM3_COMPARE_2_REGISTER (TIM3_BASE_ADDRESS + 0x38)
-    #define TIM3_COMPARE_3_REGISTER (TIM3_BASE_ADDRESS + 0x3C)
-    #define TIM3_COMPARE_4_REGISTER (TIM3_BASE_ADDRESS + 0x40)
-    #define TIM3_PRESCALER_REGISTER (TIM3_BASE_ADDRESS + 0x28)
-    #define TIM3_AUTORELOAD_REGISTER (TIM3_BASE_ADDRESS + 0X2C)
-    void initTimer3ToInterrupt( void )
-    {
-    uint16_t * reg_pointer_16;
-    uint16_t prescalervalue2, autoreloadvalue;
-    /* Timer 3 APB clock enable */
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-    /*enable the interrupt that would go to timer 3*/
-    enableNVIC_Timer3();
-    /* Compute Prescale and Autorreload */
-    prescalervalue2 = 99; //Frequency of clock is 90 MHz
-    autoreloadvalue = 65500;
-    /* Clear any pending flags in the status register */
-    reg_pointer_16 = (uint16_t *)TIM3_STATUS_REGISTER;
-    *reg_pointer_16 = 0;
-    /* Set Prescale and Autorreload */
-    reg_pointer_16 = (uint16_t *)TIM3_PRESCALER_REGISTER;
-    *reg_pointer_16 = prescalervalue2;
-    reg_pointer_16 = (uint16_t *)TIM3_AUTORELOAD_REGISTER;
-    *reg_pointer_16 = autoreloadvalue;
-    /* Set Compare Value */
-    reg_pointer_16 = (uint16_t *)TIM3_COMPARE_3_REGISTER;
-    *reg_pointer_16 = autoreloadvalue/4;
-    /* Enable Preload Register (Don’t HAVE to, but good practice) */
-    reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_MODE_2_REGISTER;
-    *reg_pointer_16 = *reg_pointer_16 | TIM_CCMR13_OCPE;
-    /*enable the TIM3 channel 3 counter and keep the default configuration for channel polarity*/
-    reg_pointer_16 = (uint16_t *)TIM3_CAPTURE_COMPARE_ENABLE_REGISTER;
-    *reg_pointer_16 = *reg_pointer_16 | TIM3_CCER_CC3E;
-    /*enable interrupt on capture compare channel 3*/
-    reg_pointer_16 = (uint16_t *)TIM3_INTERRUPT_ENABLE_REGISTER;
-    *reg_pointer_16 = (TIM_CH3_CC_INTERRUPT_ENABLE | TIM_UPDATE_INTERRUPT_ENABLE);
-    /*enable timer 3*/
-    reg_pointer_16 = (uint16_t *)TIM3_CR1_REGISTER_1;
-    *reg_pointer_16 = *reg_pointer_16 | COUNTER_ENABLE_BIT;
-    }
-
-In the interrupt service: 
-    Make the normal interrupt turn the LED on
-    Make the overflow interrupt turn the LED off and reset both interrupts 
-
-    void TIM3_IRQHandler(void)
-    {
-    uint16_t * reg_pointer_16_sr;
-    uint16_t * reg_pointer_16_dier;
-    reg_pointer_16_sr = (uint16_t *)TIM3_STATUS_REGISTER;
-    reg_pointer_16_dier = (uint16_t *)TIM3_INTERRUPT_ENABLE_REGISTER;
-    //check which interrupts fired and if they were supposed to fire, then clear the flags so they don’t keep firing,
-    // then perform actions according to these interrupts
-    //check if Output Compare 3 triggered the interrupt:
-    if (( (*reg_pointer_16_sr & TIM_CH3_CC3IF) >0) && ( (*reg_pointer_16_dier & TIM_CH3_CC_INTERRUPT_ENABLE) >0))
-    {
-    //clear interrupt
-    *reg_pointer_16_sr = ~((uint16_t)TIM_CH3_CC3IF);
-    //perform action
-    clearGPIOB0();
-    }
-    //check if Overflow triggered the interrupt: I.e. Timer Counter 3 >= Autorreload value
-    if (( (*reg_pointer_16_sr & TIM_UIF) >0) && ( (*reg_pointer_16_dier & TIM_UPDATE_INTERRUPT_ENABLE) >0))
-    {
-    //clear interrupt
-    *reg_pointer_16_sr = ~((uint16_t)TIM_UIF);
-    //perform action
-    setGPIOB0();
-    }
-    }
-
-
-
-
+    Enable the correct interrupt for tim3 Ch3 in the NVIC
+    Configure Tim3 CH3 as an output compare with the interrupts enabled 
+    In the interrupt service: 
+        Make the normal interrupt turn the LED on
+        Make the overflow interrupt turn the LED off and reset both interrupts 
 
 ### Part 7. External interrupt 6 using portC pin 6
 ● Setup PortB pin 0 as an output so you can access LED1.
@@ -189,5 +76,23 @@ In the interrupt service:
 ● Enable External interrupt 6 to PortC pin 6.
 ● Toggle LED1 every time you see a rising edge on PortC pin 6. (Toggle in the
 interrupt service routine
+
+ - make a new function to configure portc pin  as an interrupt
+    - first configure the pin as an input 
+    - then enable the EXTI tied to that pin
+        enable EXTI6 (bit 6 in EXTI_IMR)
+    - and select PC6 as the pin tied to external interript line 6
+        EXTI6[3:0] bits in SYSCFG_EXTICR2 register
+            What is the register's addresss?
+        0010 are correct values for pin C
+        bits are [27:24]
+    - select rising/falling edge config
+        - set bit  in EXTI_RTSR to 1 to enable rising edge
+        - set bit in EXTI_FTSR to enable falling edge
+    - then enable EXTI6 in NVIC
+        - set bit 23 in vector table
+
+
+
 
 

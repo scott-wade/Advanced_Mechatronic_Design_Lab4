@@ -1,7 +1,7 @@
 # Notes for Lab 4
 
 ## Next steps
- - 
+
 
 
 ### Timer as an input capture
@@ -94,7 +94,7 @@ x Reading the captured value:
 
 ## Part 2: State Machine Pseudocode
 
-    ### Pseudocode
+    ### Pseudocode - main.cpp functions
         ```
         void init(void){
             // initialize 3 output pins for LEDs
@@ -106,40 +106,83 @@ x Reading the captured value:
 
         void eventservice(void){
             // declare static state and event flag variables
-            static int state = 0;
+            static unsigned char state = 0;
             static unsigned char timerflag = 0;
             static unsigned char buttonflag = 0;
             // check timer event flag register
                 // on timeout & state R:
                     // global red_pass = checkGPIOC6();
-                    // set state to G
+                    // state = G
                     // clear red LED
                     // set green LED
                     // start TIM3
                 // on timeout & state G:
                     // global green_pass = checkGPIOC6();
-                    // set state to B
+                    // state = B
                     // clear green LED
                     // set blue LED
                     // start TIM3
                 // on timeout & state B
                     // global blue_pass = checkGPIOC6();
-                    // set state to Output
+                    // state = O
                     // clear blue LED
-                    // print correct color according to truth table
+                    // printGummyColor(red_pass, green_pass, blue_pass)
             
             // check button input
                 // on button input & state output:
-                    \\ set state to R
+                    \\ state = R
                     \\ set red LED
                     \\ start TIM3 
                     \\ print 'sampling'
 
         }
 
+        void printGummyColor(uint32_t red_pass, uint32_t green_pass, uint32_t blue_pass){
+            //print gummy color according to truth table
+        }
+
         ```
 
-    ###
+    ### Pseudocode - nucleo_led.c
+        ```
+        void setLED(unsigned char color){
+            // if color == R set GPIO A5
+            // elif color == G set GPIO A6
+            // elif color == B set GPIO A7
+        }
+        void clearLED(unsigned char color){
+            // if color == R clear GPIO A5
+            // elif color == G clear GPIO A6
+            // elif color == B clear GPIO A7
+        }
+        ```
+    
+    ### Pseudocode - hardware_stm_gpio.c
+        ```
+        void initGpioA5AsOutput(void)
+        void initGpioA6AsOutput(void)
+        void initGpioA7AsOutput(void)
+
+        void setA5(void)
+        void setA6(void)
+        void setA7(void)
+        
+        void clearA5(void)
+        void clearA6(void)
+        void clearA7(void)
+
+        void initGpioC6AsInput(void)
+        void initGpioB15AsInput(void)
+
+        uint32_t checkC6(void)
+        uint32_t checkB15(void)
+
+        ```
+    ### Pseudocode - hardware_stm_timer
+        ```
+        void init_tim3_interrupt(void)
+        void restart_tim3(void)
+        ```
 
 
 

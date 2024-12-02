@@ -40,9 +40,9 @@ void init_tim3_output3_toggle(uint16_t interval, uint8_t OC_interrupt){
     uint32_t* reg_ptr;
     // enable APB1 clock
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-    // clear update event flags in TIM3_SR (UIF?)
+    // clear TIM3_SR
     reg_ptr = (uint32_t*)TIM3_SR_REGISTER;
-    *reg_ptr = ~((uint32_t)(0b11));
+    *reg_ptr = (uint32_t)0x0000;
 
     // Upload prescale value to TIM3_PSC
     reg_ptr = TIM3_PSC_REGISTER;
@@ -263,3 +263,44 @@ void TIM3_IRQHandler(void){
         setGPIOB0();
     }
 }
+
+
+void disable_tim3(void){
+    /* Disable and reset tim3 */ 
+    uint32_t* reg_ptr; // initialize reg pointer
+    // clear the enable bit in CCR 1 
+    reg_ptr = TIM3_CR1_REGISTER;
+    *reg_ptr = *reg_ptr & ~((uint16_t)0b1);
+    // clear the value in the counter
+    reg_ptr = TIM3_CNT_REGISTER;
+    *reg_ptr = 0x0000;
+
+}
+
+void enable_tim3(void){
+    /* Enable tim3 */
+    uint32_t* reg_ptr; // initialize reg pointer
+    // set the enable bit in CCR 1 
+    reg_ptr = TIM3_CR1_REGISTER;
+    *reg_ptr = *reg_ptr | (uint16_t)0b1;
+
+}
+
+void clear_tim3_ch3_flag(void){
+    /* clear tim3 ch3 flag */
+    uint32_t* reg_ptr = (uint32_t*)TIM3_STATUS_REGISTER;; // initialize reg pointer
+    uint16_t CH3_IF_MASK = (uint16_t)(0b1<<3);
+
+    *reg_ptr = *reg_ptr & ~CH3_IF_MASK;
+
+}
+
+uint8_t read_tim3_ch3_flag(void){
+    /* return 1 if tim3 ch3 flag is on, 0 o.w */
+    uint32_t* reg_ptr = (uint32_t*)TIM3_STATUS_REGISTER; // initialize reg pointer
+    uint16_t CH3_IF_MASK = (uint16_t)(0b1<<3);
+
+    if ((*reg_ptr & CH3_IF_MASK) > 0)  return (uint8_t)1;
+    else  return (uint8_t)0;
+}
+

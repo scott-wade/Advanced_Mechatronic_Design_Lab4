@@ -46,6 +46,12 @@ void init_tim3_incap(uint16_t interval);
 void init_tim3_pwm(uint16_t interval, uint16_t ontime);
 void init_tim3_interrupt(uint16_t autoReload, uint16_t compare);
 
+void disable_tim3(void);
+void enable_tim3(void);
+void clear_tim3_ch3_flag(void);
+uint8_t read_tim3_ch3_flag(void);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -10,6 +10,7 @@
 /* Initialize state machine variables */ 
 uint8_t RED_VAL, GREEN_VAL, BLUE_VAL;
 Lab4_State CURRENT_STATE = IDLE;
+uint8_t BUTTONPUSHED = 0;
 
 
 int main (void)
@@ -38,6 +39,10 @@ int main (void)
         disable_tim3();
         clear_tim3_ch3_flag();
 
+    //initialize state vars
+    RED_VAL = 0;
+    GREEN_VAL = 0;
+    BLUE_VAL = 0;
 
     // print hello world
     debugprintHelloWorld();
@@ -62,10 +67,16 @@ void eventChecker(Queue* event_queue){
     /* Checks for events and adds them to the event queue */ 
     
     // check for a button press event
-    if (checkGPIOA6() > 0){
+    if ((checkGPIOA6() > 0) && (BUTTONPUSHED == 0) ){
         Lab4_Event new_event = BUTTONPUSH;
         enqueue(event_queue, &new_event);
+        BUTTONPUSHED = 1;
     }
+    // clear the BUTTONPUSHED flag on button not pushed
+    if ((checkGPIOA6() == 0) && (BUTTONPUSHED == 1) ){
+        BUTTONPUSHED = 0;
+    }
+
     // check for a timeout event
     if (read_tim3_ch3_flag() > 0 ){
         Lab4_Event new_event = TIMEOUT;
